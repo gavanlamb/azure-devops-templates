@@ -1,32 +1,39 @@
 parameters:
-- name: awsServiceConnectionName
-  displayName: Service connection name
-  type: string
-- name: planFile
-  displayName: Name of the plan file
-  type: string
-- name: applyAdditionalCommandOptions
-  displayName: Additional command options for apply step
-  type: string
-  default: " "
-- name: terraformVersion
-  displayName: Terraform version
-  type: string
-  default: '0.14.9'
-- name: workingDirectory
-  displayName: Working directory
-  type: string
-  default: '$(Build.SourcesDirectory)/Infrastructure'
+    -   name: awsServiceConnectionName
+        displayName: Service connection name
+        type: string
+    -   name: applyAdditionalCommandOptions
+        displayName: Additional command options for apply step
+        type: string
+        default: " "
+    -   name: planFile
+        displayName: Name of the plan file
+        type: string
+    -   name: terraformVersion
+        displayName: Terraform version
+        type: string
+        default: '0.14.9'
+    -   name: workingDirectory
+        displayName: Working directory
+        type: string
+        default: '$(Build.SourcesDirectory)/Infrastructure'
 
 steps:
-- task: TerraformInstaller@0
-  displayName: Install Terraform version:${{ parameters.terraformVersion }}
-  inputs:
-    terraformVersion: ${{ parameters.terraformVersion }}
-- task: TerraformTaskV1@0
-  inputs:
-    provider: 'aws'
-    command: 'apply'
-    commandOptions: '${{ parameters.planFile }} -auto-approve -lock=true -input=false ${{ parameters.applyAdditionalCommandOptions }}'
-    environmentServiceNameAWS: ${{ parameters.awsServiceConnectionName }}
-    workingDirectory: ${{ parameters.workingDirectory }}
+    -   task: TerraformInstaller@0
+        displayName: Install Terraform version:${{ parameters.terraformVersion }}
+        inputs:
+            terraformVersion: ${{ parameters.terraformVersion }}
+
+    -   task: DownloadPipelineArtifact@2
+        inputs:
+            buildType: 'current'
+            artifactName: '${{ parameters.planFile }}.tfplan'
+            targetPath: '${{ parameters.workingDirectory }}'
+
+    -   task: TerraformTaskV1@0
+        inputs:
+            provider: 'aws'
+            command: 'apply'
+            commandOptions: '${{ parameters.planFile }} -auto-approve -lock=true -input=false ${{ parameters.applyAdditionalCommandOptions }}'
+            environmentServiceNameAWS: ${{ parameters.awsServiceConnectionName }}
+            workingDirectory: ${{ parameters.workingDirectory }}
