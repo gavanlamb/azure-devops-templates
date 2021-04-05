@@ -1,7 +1,7 @@
 parameters:
 - name: awsServiceConnectionName
   displayName: Service connection name
-  type: string 
+  type: string
 - name: planFile
   displayName: Name of the plan file
   type: string
@@ -9,11 +9,19 @@ parameters:
   displayName: Additional command options for apply step
   type: string
   default: " "
+- name: terraformVersion
+  displayName: Terraform version
+  type: string
+  default: '0.14.9'
 - name: workingDirectory
   displayName: Working directory
   type: string
 
 steps:
+- task: TerraformInstaller@0
+  displayName: Install Terraform version:${{ parameters.terraformVersion }}
+  inputs:
+    terraformVersion: ${{ parameters.terraformVersion }}
 - task: TerraformTaskV1@0
   inputs:
     provider: 'aws'

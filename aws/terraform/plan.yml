@@ -16,6 +16,10 @@ parameters:
   displayName: Additional command options for plan step
   type: string
   default: " "
+- name: terraformVersion
+  displayName: Terraform version
+  type: string
+  default: '0.14.9'
 - name: workingDirectory
   displayName: Working directory
   type: string
@@ -24,6 +28,10 @@ parameters:
   type: string
 
 steps:
+- task: TerraformInstaller@0
+  displayName: Install Terraform version:${{ parameters.terraformVersion }}
+  inputs:
+    terraformVersion: ${{ parameters.terraformVersion }}
 - task: TerraformTaskV1@0
   displayName: Terraform Init
   inputs:
