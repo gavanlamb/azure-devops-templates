@@ -60,9 +60,8 @@ steps:
             environmentServiceNameAWS: ${{ parameters.awsServiceConnectionName }}
             workingDirectory: ${{ parameters.workingDirectory }}
 
-    -   task: PublishBuildArtifacts@1
-        displayName: Publish ${{ parameters.planFile }}
+    -   task: PublishPipelineArtifact@1
         inputs:
-            PathtoPublish: '${{ parameters.workingDirectory }}/${{ parameters.planFile }}.tfplan'
-            ArtifactName: '${{ parameters.planFile }}'
-            publishLocation: 'Container'
+            targetPath: '${{ parameters.workingDirectory }}/${{ parameters.planFile }}.tfplan'
+            artifact: '${{ parameters.planFile }}.tfplan'
+            publishLocation: 'pipeline'
