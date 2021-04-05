@@ -1,0 +1,11 @@
+parameters:
+- name: terraformVersion
+  displayName: Terraform version
+  type: string
+  default: '0.14.9'
+
+steps:
+- task: TerraformInstaller@0
+  displayName: Install Terraform version:${{ parameters.terraformVersion }}
+  inputs:
+    terraformVersion: ${{ parameters.terraformVersion }}
