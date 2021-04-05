@@ -1,0 +1,23 @@
+parameters:
+- name: awsServiceConnectionName
+  displayName: Service connection name
+  type: string 
+- name: planFile
+  displayName: Name of the plan file
+  type: string
+- name: applyAdditionalCommandOptions
+  displayName: Additional command options for apply step
+  type: string
+  default: " "
+- name: workingDirectory
+  displayName: Working directory
+  type: string
+
+steps:
+- task: TerraformTaskV1@0
+  inputs:
+    provider: 'aws'
+    command: 'apply'
+    commandOptions: '${{ parameters.planFile }} -auto-approve -lock=true -input=false ${{ parameters.applyAdditionalCommandOptions }}'
+    environmentServiceNameAWS: ${{ parameters.awsServiceConnectionName }}
+    workingDirectory: ${{ parameters.workingDirectory }}
