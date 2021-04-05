@@ -23,6 +23,7 @@ parameters:
 - name: workingDirectory
   displayName: Working directory
   type: string
+  default: '$(Build.SourcesDirectory)/Infrastructure'
 - name: workspaceName
   displayName: Workspace name
   type: string
