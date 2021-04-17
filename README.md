@@ -75,3 +75,48 @@ steps:
       workingDirectory: $(Build.SourcesDirectory)/infrastructure
       workspaceName: terraform-workspace
 ```
+
+
+
+#### Apply
+To apply changes specified in the `.tfplan` file
+
+The [apply template](./aws/terraform/apply.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps` block.
+
+##### Steps
+###### Download Artifact
+Download the pipeline artifact specified in `artifactName` to the `workingDirectory`.
+
+###### Extract Archive
+Extract the `archiveName` to `workingDirectory`
+
+###### Install version
+Install the version specified in the `version` parameter. Terraform will be available through command line.
+
+###### Apply
+Apply the changes specified in the `planFile`. If `applyAdditionalCommandOptions` is specified this will be appended to the command options.
+
+##### Parameters
+| Name                          | Description                                   | Type    | Default                 |
+|:------------------------------|:----------------------------------------------|:--------|:------------------------|
+| applyAdditionalCommandOptions | Additional command options for apply step     | string? |                         |
+| archiveName                   | Name of the archive in the artifact           | string  | `terraform.tar.gz`      |
+| artifactName                  | Name of the artifact to download              | string  |                         |
+| planFile                      | Name of the plan file to apply                | string  | `plan.tfplan`           |
+| serviceConnectionName         | Service connection name, used for init & plan | string  |                         |
+| version                       | Terraform version                             | string  | `0.14.9`                |
+| workingDirectory              | Working directory                             | string  | `$(Pipeline.Workspace)` |
+
+##### Example
+```yaml
+steps:
+- template: aws/terraform/apply.yml@templates
+  parameters:
+    applyAdditionalCommandOptions: '-no-color'
+    archiveName: terraform.tar.gz
+    artifactName: production_ap-southeast-2
+    planFile: plan.tfplan
+    serviceConnectionName: aws_ap-southeast-2
+    version: 0.14.9
+    workingDirectory: $(Pipeline.Workspace)
+```
