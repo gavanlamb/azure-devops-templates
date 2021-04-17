@@ -1,0 +1,81 @@
+parameters:
+  - name: artifactName
+    displayName: Name of the artifact produced and published
+    type: string
+  - name: initAdditionalCommandOptions
+    displayName: Additional command options for Terraform init
+    type: string
+    default: " "
+  - name: planAdditionalCommandOptions
+    displayName: Additional command options for the Terraform plan step
+    type: string
+    default: " "
+  - name: serviceConnectionName
+    displayName: Service connection name, used for init & plan
+    type: string
+  - name: stateBucketName
+    displayName: Name of the S3 bucket that Terraform uses to store state
+    type: string
+  - name: stateLockTableName
+    displayName: Name of the DynamoDB table used by Terraform to lock state
+    type: string
+  - name: version
+    displayName: Terraform version
+    type: string
+    default: 0.14.9
+  - name: workingDirectory
+    displayName: Directory where the terraform files are stored
+    type: string
+    default: $(Build.SourcesDirectory)/infrastructure
+  - name: workspaceName
+    displayName: Terraform workspace name
+    type: string
+
+steps:
+  - task: TerraformInstaller@0
+    displayName: Install version:${{ parameters.version }}
+    inputs:
+      terraformVersion: ${{ parameters.version }}
+
+  - task: TerraformTaskV1@0
+    displayName: Init
+    inputs:
+      provider: aws
+      command: init
+      commandOptions: '-input=false -lock=true -backend-config="dynamodb_table=${{ parameters.stateLockTableName }}" ${{ parameters.initAdditionalCommandOptions }}'
+      backendServiceAWS: ${{ parameters.serviceConnectionName }}
+      backendAWSKey: terraform.tfstate
+      backendAWSBucketName: ${{ parameters.stateBucketName }}
+      workingDirectory: ${{ parameters.workingDirectory }}
+
+  - script: |
+      lowerWorkspaceName='${{ lower(parameters.workspaceName) }}'
+      terraform workspace new $lowerWorkspaceName || terraform workspace select $lowerWorkspaceName
+    displayName: Select workspace
+    workingDirectory: ${{ parameters.workingDirectory }}
+
+  - task: TerraformTaskV1@0
+    displayName: Plan
+    inputs:
+      provider: aws
+      command: plan
+      commandOptions: '-out=plan.tfplan ${{ parameters.planAdditionalCommandOptions }}'
+      environmentServiceNameAWS: ${{ parameters.serviceConnectionName }}
+      workingDirectory: ${{ parameters.workingDirectory }}
+
+  - task: ArchiveFiles@2
+    displayName: Archive
+    inputs:
+      rootFolderOrFile: ${{ parameters.workingDirectory }}
+      includeRootFolder: false
+      archiveType: tar
+      tarCompression: gz
+      archiveFile: ${{ parameters.workingDirectory }}/terraform.tar.gz
+      replaceExistingArchive: true
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish
+    inputs:
+      targetPath: ${{ parameters.workingDirectory }}/terraform.tar.gz
+      artifact: ${{ parameters.artifactName }}
+      publishLocation: pipeline
