@@ -42,7 +42,7 @@ steps:
     inputs:
       provider: aws
       command: init
-      commandOptions: '-input=false -lock=true -backend-config="dynamodb_table=${{ parameters.stateLockTableName }}" ${{ parameters.initAdditionalCommandOptions }}'
+      commandOptions: '-input=false -backend-config="dynamodb_table=${{ parameters.stateLockTableName }}" ${{ parameters.initAdditionalCommandOptions }}'
       backendServiceAWS: ${{ parameters.serviceConnectionName }}
       backendAWSKey: terraform.tfstate
       backendAWSBucketName: ${{ parameters.stateBucketName }}
