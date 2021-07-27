@@ -77,7 +77,6 @@ steps:
 ```
 
 
-
 #### Apply
 To apply changes specified in the `.tfplan` file
 
@@ -119,4 +118,29 @@ steps:
     serviceConnectionName: aws_ap-southeast-2
     version: 0.14.9
     workingDirectory: $(Pipeline.Workspace)
+```
+
+
+## Docker
+#### Build
+To build the specified target in a `Dockerfile`.
+
+The [build template](./docker/build.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
+
+The `target` parameter will be used as the name.
+
+##### Parameters
+| Name           | Description             | Type   | Default              |
+|:---------------|:------------------------|:-------|:---------------------|
+| dockerfilePath | Path of the dockerfile  | string | Dockerfile           |
+| target         | Name of target to build | string |                      |
+| tag            | Tag of image            | string | $(Build.BuildNumber) |
+
+##### Example
+```yaml
+- template: ./docker/build.yml@templates
+  parameters: 
+    dockerfilePath: src/Dockerfile
+    target: build
+    tag: 1.0.0-preview
 ```
