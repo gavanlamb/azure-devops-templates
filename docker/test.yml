@@ -27,7 +27,7 @@ parameters:
 steps:
   - script: |
       docker run --rm -v $(Common.TestResultsDirectory):${{ parameters.containerTestResultsDirectory }} ${{ parameters.containerName }}:${{ parameters.tag }}
-    displayName: Run test container
+    displayName: Run ${{ parameters.containerName }}
     continueOnError: true
 
   - task: PublishCodeCoverageResults@1
