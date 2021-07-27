@@ -144,3 +144,32 @@ The `target` parameter will be used as the name.
     target: build
     tag: 1.0.0-preview
 ```
+
+#### Test
+To build the specified target in a `Dockerfile`.
+
+The [test template](./docker/test.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
+
+The `target` parameter will be used as the name.
+
+##### Parameters
+| Name                          | Description                                                | Type   | Default                           |
+|:------------------------------|:-----------------------------------------------------------|:-------|:----------------------------------|
+| containerTestResultsDirectory | Path in the container to where test results are written to | string | /artifacts/tests                  |
+| containerName                 | Name of the container to run                               | string | tests                             |
+| coverageThreshold             | Threshold for code coverage                                | string | 60                                |
+| pathToSources                 | Directory containing source code                           | string | $(System.DefaultWorkingDirectory) |
+| tag                           | Tag of image                                               | string | $(Build.BuildNumber)              |
+| testResultsFormat             | Format of test result/s file                               | string | VSTest                            |
+
+##### Example
+```yaml
+- template: ./docker/test.yml@templates
+  parameters:
+    containerTestResultsDirectory: /artifacts/tests
+    containerName: tests
+    tag: $(Build.BuildNumber)
+    pathToSources: $(System.DefaultWorkingDirectory)
+    testResultsFormat: 'VSTest'
+    coverageThreshold: '60'
+```
