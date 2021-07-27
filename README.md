@@ -13,12 +13,38 @@ resources:
       endpoint: gavanlamb
 ```
 
-## Terraform
-### Setup
-1. Install the [Terraform plugin](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks)  
-2. Follow the `Create a new service connection for connecting to an AWS account` step and create an AWS service connection  
+## AWS
+### CLI
+#### ECR push
+To build push an image to ECR
 
-### AWS
+The [ecr.push](./docker/build.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
+
+##### Parameters
+| Name              | Description                             | Type   | Default              |
+|:------------------|:----------------------------------------|:-------|:---------------------|
+| awsCredentials    | Name of the AWS credentials to use      | string |                      |
+| awsRegion         | Name of the region to push to           | string |                      |
+| imageName         | Name of the image to push               | string |                      |
+| repositoryName    | Name of the repository to push image to | string |                      |
+| tag               | Tag of the image to push                | string | $(Build.BuildNumber) |
+
+##### Example
+```yaml
+- template: ./aws/cli/ecr.push.yml@templates
+  parameters:
+    awsCredentials: 'AWS ap-southeast-2 production'
+    awsRegion: ap-southeast-2
+    imageName: migration
+    repositoryName: migration
+```
+
+
+### Terraform
+#### Setup
+1. Install the [Terraform plugin](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks)
+2. Follow the `Create a new service connection for connecting to an AWS account` step and create an AWS service connection
+
 #### Plan
 To generate a Terraform plan for the specified infrastructure.
 
@@ -146,7 +172,7 @@ The `target` parameter will be used as the name.
 ```
 
 #### Test
-To build the specified target in a `Dockerfile`.
+To run a container that will execute tests
 
 The [test template](./docker/test.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
 

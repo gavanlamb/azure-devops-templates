@@ -1,0 +1,29 @@
+parameters:
+  - name: awsCredentials
+    displayName: Name of the AWS credentials to use
+    type: string
+  - name: awsRegion
+    displayName: Name of the region to push to
+    type: string
+  - name: imageName
+    displayName: Name of the image to push
+    type: string
+  - name: repositoryName
+    displayName: Name of the repository to push image to
+    type: string
+  - name: tag
+    displayName: Tag of the image to push
+    type: string
+    default: $(Build.BuildNumber)
+
+steps:
+  - task: ECRPushImage@1
+    displayName: Push container
+    inputs:
+      awsCredentials: '${{ parameters.awsCredentials }}'
+      regionName: ${{ parameters.awsRegion }}
+      imageSource: imagename
+      sourceImageName: ${{ parameters.imageName }}
+      sourceImageTag: ${{ parameters.tag }}
+      repositoryName: ${{ parameters.repositoryName }}
+      pushTag: ${{ parameters.tag }}
