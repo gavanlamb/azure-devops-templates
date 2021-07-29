@@ -22,7 +22,7 @@ parameters:
   - name: version
     displayName: Terraform version
     type: string
-    default: 0.14.9
+    default: 1.0.2
   - name: workingDirectory
     displayName: Directory where the terraform files are stored
     type: string
