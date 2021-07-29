@@ -146,6 +146,16 @@ steps:
     workingDirectory: $(Pipeline.Workspace)
 ```
 
+## Job
+### approve.yml
+```yaml
+jobs:
+  - template: ./templates/approve.yml
+    parameters:
+      dependsOn: plan
+      timeoutInMinutes: 60
+      notifyUsers: '[Expensely]\Expensely Team'
+```
 
 ## Docker
 #### Build
