@@ -150,7 +150,7 @@ steps:
 ### approve.yml
 ```yaml
 jobs:
-  - template: ./templates/approve.yml
+  - template: ./jon/approve.yml@templates
     parameters:
       dependsOn: plan
       timeoutInMinutes: 60
