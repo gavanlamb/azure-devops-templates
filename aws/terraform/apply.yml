@@ -51,6 +51,6 @@ steps:
     inputs:
       provider: aws
       command: apply
-      commandOptions: '-auto-approve -lock=true -input=false ${{ parameters.applyAdditionalCommandOptions }} ${{ parameters.planFile }}'
+      commandOptions: '-no-color -auto-approve -lock=true -input=false ${{ parameters.applyAdditionalCommandOptions }} ${{ parameters.planFile }}'
       environmentServiceNameAWS: ${{ parameters.serviceConnectionName }}
       workingDirectory: ${{ parameters.workingDirectory }}
