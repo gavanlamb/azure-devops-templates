@@ -42,7 +42,7 @@ steps:
     inputs:
       provider: aws
       command: init
-      commandOptions: '-input=false -backend-config="dynamodb_table=${{ parameters.stateLockTableName }}" ${{ parameters.initAdditionalCommandOptions }}'
+      commandOptions: '-no-color -input=false -backend-config="dynamodb_table=${{ parameters.stateLockTableName }}" ${{ parameters.initAdditionalCommandOptions }}'
       backendServiceAWS: ${{ parameters.serviceConnectionName }}
       backendAWSKey: terraform.tfstate
       backendAWSBucketName: ${{ parameters.stateBucketName }}
@@ -59,7 +59,7 @@ steps:
     inputs:
       provider: aws
       command: plan
-      commandOptions: '-out=plan.tfplan ${{ parameters.planAdditionalCommandOptions }}'
+      commandOptions: '-no-color -out=plan.tfplan ${{ parameters.planAdditionalCommandOptions }}'
       environmentServiceNameAWS: ${{ parameters.serviceConnectionName }}
       workingDirectory: ${{ parameters.workingDirectory }}
 
