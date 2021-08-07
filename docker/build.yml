@@ -10,6 +10,10 @@ parameters:
     displayName: Tag of image
     type: string
     default: $(Build.BuildNumber)
+  - name: argument
+    displayName: Additional argument values
+    type: string
+    default: " "
 
 steps:
   - task: Docker@2
@@ -17,5 +21,5 @@ steps:
     inputs:
       command: build
       Dockerfile: '${{ parameters.dockerfilePath }}'
-      arguments: '--target ${{ parameters.target }} -t ${{ parameters.target }}:${{ parameters.tag }}'
+      arguments: '--target ${{ parameters.target }} -t ${{ parameters.target }}:${{ parameters.tag }}' ${{ parameters.argument }}
       addPipelineData: false
