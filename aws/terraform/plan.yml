@@ -57,6 +57,7 @@ steps:
         terraform workspace new $lowerWorkspaceName || terraform workspace select $lowerWorkspaceName
       errorActionPreference: 'continue'
       showWarnings: true
+      pwsh: true
       workingDirectory: '${{ parameters.workingDirectory }}'
 
   - task: TerraformTaskV1@0
