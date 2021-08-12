@@ -48,11 +48,20 @@ steps:
       backendAWSBucketName: ${{ parameters.stateBucketName }}
       workingDirectory: ${{ parameters.workingDirectory }}
 
-  - script: |
-      lowerWorkspaceName='${{ lower(parameters.workspaceName) }}'
-      terraform workspace new $lowerWorkspaceName || terraform workspace select $lowerWorkspaceName
+  - task: PowerShell@2
     displayName: Select workspace
-    workingDirectory: ${{ parameters.workingDirectory }}
+    inputs:
+      targetType: 'inline'
+      script: |
+        $lowerWorkspaceName='${{ lower(parameters.workspaceName) }}'
+        try { 
+          terraform workspace new $lowerWorkspaceName 
+        } catch { 
+          terraform workspace select $lowerWorkspaceName 
+        }
+      errorActionPreference: 'continue'
+      showWarnings: true
+      workingDirectory: '${{ parameters.workingDirectory }}'
 
   - task: TerraformTaskV1@0
     displayName: Plan
