@@ -1,8 +1,8 @@
 parameters:
-  - name: awsCredentials
+  - name: serviceConnectionName
     displayName: Name of the AWS credentials to use
     type: string
-  - name: awsRegion
+  - name: region
     displayName: Name of the region to push to
     type: string
   - name: imageName
@@ -20,8 +20,8 @@ steps:
   - task: ECRPushImage@1
     displayName: Push container
     inputs:
-      awsCredentials: '${{ parameters.awsCredentials }}'
-      regionName: ${{ parameters.awsRegion }}
+      awsCredentials: '${{ parameters.serviceConnectionName }}'
+      regionName: ${{ parameters.region }}
       imageSource: imagename
       sourceImageName: ${{ parameters.imageName }}
       sourceImageTag: ${{ parameters.tag }}
