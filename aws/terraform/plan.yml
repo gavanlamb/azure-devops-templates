@@ -54,10 +54,7 @@ steps:
       targetType: 'inline'
       script: |
         $lowerWorkspaceName='${{ lower(parameters.workspaceName) }}'
-        terraform workspace new $lowerWorkspaceName
-        if ($lastExitCode -ne "0") { 
-          terraform workspace select $lowerWorkspaceName 
-        }
+        terraform workspace new $lowerWorkspaceName || terraform workspace select $lowerWorkspaceName
       errorActionPreference: 'continue'
       showWarnings: true
       workingDirectory: '${{ parameters.workingDirectory }}'
