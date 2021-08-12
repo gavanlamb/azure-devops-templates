@@ -21,20 +21,20 @@ To build push an image to ECR
 The [ecr.push](./docker/build.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
 
 ##### Parameters
-| Name              | Description                             | Type   | Default              |
-|:------------------|:----------------------------------------|:-------|:---------------------|
-| awsCredentials    | Name of the AWS credentials to use      | string |                      |
-| awsRegion         | Name of the region to push to           | string |                      |
-| imageName         | Name of the image to push               | string |                      |
-| repositoryName    | Name of the repository to push image to | string |                      |
-| tag               | Tag of the image to push                | string | $(Build.BuildNumber) |
+| Name                  | Description                             | Type   | Default              |
+|:----------------------|:----------------------------------------|:-------|:---------------------|
+| serviceConnectionName | Name of the AWS credentials to use      | string |                      |
+| region                | Name of the region to push to           | string |                      |
+| imageName             | Name of the image to push               | string |                      |
+| repositoryName        | Name of the repository to push image to | string |                      |
+| tag                   | Tag of the image to push                | string | $(Build.BuildNumber) |
 
 ##### Example
 ```yaml
 - template: ./aws/cli/ecr.push.yml@templates
   parameters:
-    awsCredentials: 'AWS ap-southeast-2 production'
-    awsRegion: ap-southeast-2
+    serviceConnectionName: 'AWS ap-southeast-2 production'
+    region: ap-southeast-2
     imageName: migration
     repositoryName: migration
 ```
