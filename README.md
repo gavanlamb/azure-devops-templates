@@ -218,7 +218,7 @@ steps:
     version: 1.0.4
     serviceConnectionName: connection
     initAdditionalCommandOptions: 'args'
-    terraformDestroyAdditionalArguments: '-var-file=variables/$(environment).$(region).tfvars'
+    destroyAdditionalArguments: '-var-file=variables/$(environment).$(region).tfvars'
     stateBucketName: bucket
     stateLockTableName: lock-table
     workspaceName: service-production
