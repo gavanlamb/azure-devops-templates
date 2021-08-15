@@ -108,9 +108,10 @@ Will publish the archive produced from the archive step to the pipeline with the
 | serviceConnectionName        | Service connection name, used for init & plan. Name of the service connection created above in the setup step.                                                                     | string  |                                            |
 | stateBucketName              | Name of the S3 bucket that Terraform uses to store state                                                                                                                           | string  |                                            |
 | stateLockTableName           | Name of the DynamoDB table used by Terraform to lock state. This value is mapped to a backend config variable named `dynamodb_table` in command `commandOptions` of the init step. | string  |                                            |
-| version                      | Terraform version                                                                                                                                                                  | string  | `0.14.9`                                   |
+| version                      | Terraform version                                                                                                                                                                  | string  | `1.0.2`                                    |
 | workingDirectory             | Directory where the terraform files are stored                                                                                                                                     | string  | `$(Build.SourcesDirectory)/infrastructure` |
 | workspaceName                | Terraform workspace name                                                                                                                                                           | string  |                                            |
+| stateFilename                | Name and path of the state file location                                                                                                                                           | string  | terraform.tfstate                          |
 
 ##### Example
 ```yaml
@@ -126,6 +127,7 @@ steps:
       version: 0.14.9
       workingDirectory: $(Build.SourcesDirectory)/infrastructure
       workspaceName: terraform-workspace
+      stateFilename: terraform.tfstate
 ```
 
 
@@ -155,7 +157,7 @@ Apply the changes specified in the `planFile`. If `applyAdditionalCommandOptions
 | artifactName                  | Name of the artifact to download              | string  |                         |
 | planFile                      | Name of the plan file to apply                | string  | `plan.tfplan`           |
 | serviceConnectionName         | Service connection name, used for init & plan | string  |                         |
-| version                       | Terraform version                             | string  | `0.14.9`                |
+| version                       | Terraform version                             | string  | `1.0.2`                 |
 | workingDirectory              | Working directory                             | string  | `$(Pipeline.Workspace)` |
 
 ##### Example
@@ -170,6 +172,57 @@ steps:
     serviceConnectionName: aws_ap-southeast-2
     version: 0.14.9
     workingDirectory: $(Pipeline.Workspace)
+```
+
+#### Destroy
+To destroy resources
+
+The [destroy template](./aws/terraform/destroy.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps` block.
+
+##### Steps
+###### Install version
+Install the version specified in the `version` parameter. Terraform will be available through command line.
+
+###### Init
+Initialise Terraform in the `workingDirectory` using the `serviceConnectionName`, `stateBucketName`, `stateLockTableName`, `initAdditionalCommandOptions`.  
+
+The default backend key is `terraform.tfstate`
+
+###### Select Workspace
+Will select the workspace or create and select it if it doesn't exist. The `workspaceName` will be transformed to a lower case value.
+
+###### Destroy
+Destroy all resources specified in the in the configuration. If `destroyAdditionalArguments` is specified this will be appended to the command options.
+
+###### Delete workspace
+Will delete the workspace from the backend
+
+##### Parameters
+| Name                         | Description                                                | Type    | Default                                    |
+|:-----------------------------|:-----------------------------------------------------------|:--------|:-------------------------------------------|
+| version                      | Terraform version                                          | string? | `1.0.2`                                    |
+| stateLockTableName           | Name of the DynamoDB table used by Terraform to lock state | string  |                                            |
+| initAdditionalCommandOptions | Additional command options for Terraform init              | string? |                                            |
+| destroyAdditionalArguments   | Additional command options for Terraform destroy command   | string? |                                            |
+| serviceConnectionName        | Service connection name, used for init & plan              | string  |                                            |
+| stateBucketName              | Name of the S3 bucket that Terraform uses to store state   | string  |                                            |
+| workingDirectory             | Working directory                                          | string  | `$(Build.SourcesDirectory)/infrastructure` |
+| workspaceName                | Terraform workspace name                                   | string  |                                            |
+| stateFilename                | Name and path of the state file location                   | string  | terraform.tfstate                          |
+
+##### Example
+```yaml
+steps:
+- template: aws/terraform/apply.yml@templates
+  parameters:
+    version: 1.0.4
+    serviceConnectionName: connection
+    initAdditionalCommandOptions: 'args'
+    terraformDestroyAdditionalArguments: '-var-file=variables/$(environment).$(region).tfvars'
+    stateBucketName: bucket
+    stateLockTableName: lock-table
+    workspaceName: service-production
+    stateFilename: terraform.tfstate
 ```
 
 ## Job
