@@ -15,10 +15,36 @@ resources:
 
 ## AWS
 ### CLI
+#### CodeDeploy deploy
+To create a deployment and apply it
+
+The [codedeploy.deploy.yml](./aws/cli/codedeploy.deploy.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
+
+##### Parameters
+| Name                  | Description                                       | Type   | Default               |
+|:----------------------|:--------------------------------------------------|:-------|:----------------------|
+| sourcePath            | Path of the app spec file                         | string |                       |
+| destinationPath       | Path(key) in the bucket to upload file to         | string |                       |
+| codedeployBucketName  | Name of the bucket to upload the app spec file to | string |                       |
+| workingDirectory      | Directory where the files are located             | string | $(Pipeline.Workspace) |
+| serviceConnectionName | Name of the service connection for AWS            | string |                       |
+| region                | Name of the AWS region                            | string |                       |
+
+##### Example
+```yaml
+- template: ./aws/cli/codedeploy.deploy.yml@templates
+  parameters:
+    serviceConnectionName: 'AWS ap-southeast-2 production'
+    region: ap-southeast-2
+    sourcePath: time-1.0.23.0.yaml
+    destinationPath: time/production/time-1.0.23.0.yaml
+    codeDeployBucketName: 'codedeploy-sydney-production'
+```
+
 #### ECR push
 To build push an image to ECR
 
-The [ecr.push](./docker/build.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
+The [ecr.push.yml](./aws/cli/ecr.push.yml) is a [step template](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#step-reuse) meaning it needs to be nested under a `steps:` block.
 
 ##### Parameters
 | Name                  | Description                             | Type   | Default              |
