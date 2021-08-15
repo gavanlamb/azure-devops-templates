@@ -30,6 +30,10 @@ parameters:
   - name: workspaceName
     displayName: Terraform workspace name
     type: string
+  - name: stateFilename
+    displayName: Terraform workspace name
+    type: string
+    default: terraform.tfstate
 
 steps:
   - task: TerraformInstaller@0
@@ -44,7 +48,7 @@ steps:
       command: init
       commandOptions: '-no-color -input=false -backend-config="dynamodb_table=${{ parameters.stateLockTableName }}" ${{ parameters.initAdditionalCommandOptions }}'
       backendServiceAWS: ${{ parameters.serviceConnectionName }}
-      backendAWSKey: terraform.tfstate
+      backendAWSKey: ${{ parameters.stateFilename }}
       backendAWSBucketName: ${{ parameters.stateBucketName }}
       workingDirectory: ${{ parameters.workingDirectory }}
 
