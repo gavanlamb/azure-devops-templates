@@ -83,9 +83,9 @@ steps:
       archiveFile: ${{ parameters.workingDirectory }}/terraform.tar.gz
       replaceExistingArchive: true
 
-  - task: PublishPipelineArtifact@1
+  - task: PublishBuildArtifacts@1
     displayName: Publish
     inputs:
-      targetPath: ${{ parameters.workingDirectory }}/terraform.tar.gz
-      artifact: ${{ parameters.artifactName }}
-      publishLocation: pipeline
+      PathtoPublish: ${{ parameters.workingDirectory }}/terraform.tar.gz
+      ArtifactName: ${{ parameters.artifactName }}
+      publishLocation: Container

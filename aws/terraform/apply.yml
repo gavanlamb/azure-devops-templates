@@ -28,7 +28,7 @@ parameters:
 
 steps:
   - task: DownloadPipelineArtifact@2
-    displayName: Download Artifact
+    displayName: Download artifact
     inputs:
       buildType: current
       artifactName: ${{ parameters.artifactName }}
