@@ -18,7 +18,7 @@ parameters:
 
 steps:
   - task: ECRPushImage@1
-    displayName: Push container
+    displayName: Push image:${{ parameters.imageName }}
     inputs:
       awsCredentials: '${{ parameters.serviceConnectionName }}'
       regionName: ${{ parameters.region }}
