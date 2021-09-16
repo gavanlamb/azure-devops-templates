@@ -33,11 +33,19 @@ steps:
       showWarnings: true
       errorActionPreference: 'continue'
 
+  - task: reportgenerator@4
+    displayName: Merge Cobertura reports
+    inputs:
+      reports: '$(Common.TestResultsDirectory)/**/In/**/coverage.cobertura.xml'
+      targetdir: '$(Common.TestResultsDirectory)/coveragereport'
+      reporttypes: 'Cobertura'
+      sourcedirs: '${{ parameters.pathToSources }}'
+
   - task: PublishCodeCoverageResults@1
     displayName: Publish code coverage results
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: ' $(Common.TestResultsDirectory)/**/coverage.cobertura.xml'
+      summaryFileLocation: '$(Common.TestResultsDirectory)/coveragereport/Cobertura.xml'
       pathToSources: '${{ parameters.pathToSources }}'
 
   - task: PublishTestResults@2
@@ -46,9 +54,10 @@ steps:
       testResultsFormat: '${{ parameters.testResultsFormat }}'
       testResultsFiles: '**/*.trx'
       searchFolder: '$(Common.TestResultsDirectory)'
-      mergeTestResults: false
+      mergeTestResults: true
       failTaskOnFailedTests: true
       testRunTitle: 'Tests'
+      publishRunAttachments: false
 
   - task: BuildQualityChecks@8
     displayName: Check code coverage
