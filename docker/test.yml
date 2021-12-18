@@ -1,0 +1,69 @@
+parameters:
+  - name: containerTestResultsDirectory
+    displayName: Path in the container to where test results are written to
+    type: string
+    default: /artifacts/tests
+  - name: containerName
+    displayName: Name of the container to run
+    type: string
+    default: tests
+  - name: coverageThreshold
+    displayName: Threshold for code coverage
+    type: string
+    default: 60
+  - name: pathToSources
+    displayName: Directory containing source code
+    type: string
+    default: $(System.DefaultWorkingDirectory)
+  - name: tag
+    displayName: Tag of image
+    type: string
+    default: $(Build.BuildNumber)
+  - name: testResultsFormat
+    displayName: Format of test result/s file
+    type: string
+    default: VSTest
+
+steps:
+  - task: PowerShell@2
+    displayName: Run ${{ parameters.containerName }}
+    inputs:
+      targetType: 'inline'
+      script: 'docker run --rm -v $(Common.TestResultsDirectory):${{ parameters.containerTestResultsDirectory }} ${{ parameters.containerName }}:${{ parameters.tag }}'
+      showWarnings: true
+      errorActionPreference: 'continue'
+
+  - task: reportgenerator@4
+    displayName: Merge Cobertura reports
+    inputs:
+      reports: '$(Common.TestResultsDirectory)/**/In/**/coverage.cobertura.xml'
+      targetdir: '$(Common.TestResultsDirectory)/coveragereport'
+      reporttypes: 'Cobertura'
+      sourcedirs: '${{ parameters.pathToSources }}'
+
+  - task: PublishCodeCoverageResults@1
+    displayName: Publish code coverage results
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(Common.TestResultsDirectory)/coveragereport/Cobertura.xml'
+      pathToSources: '${{ parameters.pathToSources }}'
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testResultsFormat: '${{ parameters.testResultsFormat }}'
+      testResultsFiles: '**/*.trx'
+      searchFolder: '$(Common.TestResultsDirectory)'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: 'Tests'
+      publishRunAttachments: false
+
+  - task: BuildQualityChecks@8
+    displayName: Check code coverage
+    inputs:
+      checkCoverage: true
+      coverageFailOption: 'fixed'
+      coverageType: 'branches'
+      treat0of0as100: true
+      coverageThreshold: '${{ parameters.coverageThreshold }}'

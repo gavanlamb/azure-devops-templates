@@ -1,0 +1,25 @@
+parameters:
+  - name: dockerfilePath
+    displayName: Path of the dockerfile
+    type: string
+    default: Dockerfile
+  - name: target
+    displayName: Name of target to build
+    type: string
+  - name: tag
+    displayName: Tag of image
+    type: string
+    default: $(Build.BuildNumber)
+  - name: argument
+    displayName: Additional argument values
+    type: string
+    default: " "
+
+steps:
+  - task: Docker@2
+    displayName: Build ${{ parameters.target }} image
+    inputs:
+      command: build
+      Dockerfile: '${{ parameters.dockerfilePath }}'
+      arguments: '--target ${{ parameters.target }} -t ${{ parameters.target }}:${{ parameters.tag }} ${{ parameters.argument }}'
+      addPipelineData: false

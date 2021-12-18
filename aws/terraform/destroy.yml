@@ -1,13 +1,17 @@
-parameters:
-  - name: artifactName
-    displayName: Name of the artifact produced and published
+﻿parameters:
+  - name: version
+    displayName: Terraform version
+    type: string
+    default: 1.0.2
+  - name: stateLockTableName
+    displayName: Name of the DynamoDB table used by Terraform to lock state
     type: string
   - name: initAdditionalCommandOptions
     displayName: Additional command options for Terraform init
     type: string
     default: " "
-  - name: planAdditionalCommandOptions
-    displayName: Additional command options for the Terraform plan step
+  - name: destroyAdditionalArguments
+    displayName: Additional command options for Terraform destroy command
     type: string
     default: " "
   - name: serviceConnectionName
@@ -16,13 +20,6 @@ parameters:
   - name: stateBucketName
     displayName: Name of the S3 bucket that Terraform uses to store state
     type: string
-  - name: stateLockTableName
-    displayName: Name of the DynamoDB table used by Terraform to lock state
-    type: string
-  - name: version
-    displayName: Terraform version
-    type: string
-    default: 1.0.2
   - name: workingDirectory
     displayName: Directory where the terraform files are stored
     type: string
@@ -64,28 +61,24 @@ steps:
       pwsh: true
       workingDirectory: '${{ parameters.workingDirectory }}'
 
-  - task: TerraformTaskV1@0
-    displayName: Plan
+  - task: TerraformTaskV2@2
+    displayName: Destroy
     inputs:
-      provider: aws
-      command: plan
-      commandOptions: '-no-color -out=plan.tfplan ${{ parameters.planAdditionalCommandOptions }}'
+      provider: 'aws'
+      command: 'destroy'
+      commandOptions: '${{ parameters.destroyAdditionalArguments }}'
       environmentServiceNameAWS: ${{ parameters.serviceConnectionName }}
-      workingDirectory: ${{ parameters.workingDirectory }}
+      workingDirectory: '${{ parameters.workingDirectory }}'
 
-  - task: ArchiveFiles@2
-    displayName: Archive
+  - task: PowerShell@2
+    displayName: Delete workspace
     inputs:
-      rootFolderOrFile: ${{ parameters.workingDirectory }}
-      includeRootFolder: false
-      archiveType: tar
-      tarCompression: gz
-      archiveFile: ${{ parameters.workingDirectory }}/terraform.tar.gz
-      replaceExistingArchive: true
-
-  - task: PublishBuildArtifacts@1
-    displayName: Publish
-    inputs:
-      PathtoPublish: ${{ parameters.workingDirectory }}/terraform.tar.gz
-      ArtifactName: ${{ parameters.artifactName }}
-      publishLocation: Container
+      targetType: 'inline'
+      script: |
+        $lowerWorkspace='${{ lower(parameters.workspaceName) }}'
+        terraform workspace select default
+        terraform workspace delete $lowerWorkspace
+      errorActionPreference: 'continue'
+      showWarnings: true
+      pwsh: true
+      workingDirectory: '${{ parameters.workingDirectory }}'
