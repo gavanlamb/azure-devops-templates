@@ -1,7 +1,7 @@
 # Azure DevOps Templates
 This repository contains templates for Azure DevOps.
 
-To use the templates add a resource section to the top of the pipeline file.  
+To use these templates, add a resource section to the top of the pipeline file.  
 [Read more about resources](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/resources?view=azure-devops&tabs=schema)  
 Example:  
 ```yaml
